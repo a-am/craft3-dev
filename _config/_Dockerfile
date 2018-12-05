@@ -1,0 +1,62 @@
+FROM alpine:latest
+
+MAINTAINER Adam Randlett <adam@tippingmedia.com>
+
+RUN apk --update --no-cache add \
+	bash \
+	nano \
+	git \
+	wget \
+	unzip \
+	curl \
+	php7 \
+	php7-fpm \
+	php7-ctype \
+	php7-openssl\
+	php7-zip \
+	php7-phar \
+	php7-pdo \
+	php7-pdo_mysql \
+	php7-pdo_pgsql \
+	php7-mcrypt \
+	php7-gd \
+	php7-session \
+	php7-openssl \
+	php7-mbstring \
+	php7-json \
+	php7-curl \
+	php7-dom \
+	php7-exif \
+	php7-posix \
+	php7-opcache \
+	php7-simplexml\
+	php7-xml \
+	php7-xmlreader \
+    php7-xmlwriter \
+	php7-intl \
+	php7-iconv\
+	php7-fileinfo \
+	php7-imagick \
+	&& rm -rf /var/cache/apk/*
+
+RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
+	&& curl -o /tmp/composer-setup.sig https://composer.github.io/installer.sig \
+	# Make sure we're installing what we think we're installing!
+	&& php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" \
+	&& php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --snapshot \
+	&& rm -f /tmp/composer-setup.*
+
+RUN apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv
+ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so php
+
+RUN mkdir /app
+
+COPY ./config/php.ini /etc/php7/conf.d/50-setting.ini
+
+COPY ./config/php-fpm.conf /etc/php7/php-fpm.conf
+
+WORKDIR /app
+
+EXPOSE 9000
+
+CMD ["php-fpm7", "-F"]

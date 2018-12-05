@@ -1,0 +1,46 @@
+version: '2'
+
+services:
+
+    php-fpm:
+        build: "."
+        container_name: php-fpm
+        volumes:
+            - ./beta/web:/app/web
+            - ./beta/vendor:/app/vendor
+            - ./beta/storage:/app/storage
+            - ./beta/templates:/app/templates
+            - ./beta/config:/app/config
+            - ./beta/:/app
+            - /Volumes/Grid/Projects/Venti3/vendor/tippingmedia:/app/dev-plugins
+            - /Volumes/Grid/Devbox/www/plugin.dev/craft/plugins:/app/dev2-plugins
+
+    nginx:
+        image: nginx:alpine
+        container_name: nginx
+        ports:
+            - 80:80
+        volumes:
+            - ./beta/web:/app/web
+            - ./beta/vendor:/app/vendor
+            - ./beta/storage:/app/storage
+            - ./beta/templates:/app/templates
+            - ./beta/config:/app/config
+            - ./beta:/app
+            - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+            - /Volumes/Grid/Projects/Venti3/vendor/tippingmedia:/app/dev-plugins
+            - /Volumes/Grid/Devbox/www/plugin.dev/craft/plugins:/app/dev2-plugins
+
+    mysql-server:
+      image: mysql:5.7
+      container_name: mysql-server
+      ports:
+        - "3306:3306"
+      volumes:
+        - "./beta/storage/database:/var/lib/mysql"
+      environment:
+        MYSQL_ROOT_PASSWORD: secret
+        MYSQL_DATABASE: craft3_craft
+        MYSQL_PASSWORD: secret
+        MYSQL_USER: root
+        MYSQL_ALLOW_EMPTY_PASSWORD: "no"

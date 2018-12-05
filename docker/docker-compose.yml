@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+    php-fpm:
+        build: "./php-fpm"
+        container_name: php-fpm
+        networks:
+            - rnet
+        volumes:
+            - ../:${PHP_APP_DIR}
+            - /Volumes/Grid/Projects/Venti3/vendor/tippingmedia:/app/dev-plugins
+            - /Volumes/Grid/Devbox/www/plugin.dev/craft/plugins:/app/dev2-plugins
+        ports:
+            - "9000:9000"
+        depends_on:
+            - mysql-server
+        environment:
+            NGINX_EXPOSED_PORT: ${NGINX_EXPOSED_PORT}
+            PHP_ROOT_DIR: ${PHP_ROOT_DIR}
+            PHP_WORK_DIR: ${PHP_WORK_DIR}
+            WEB_USER: ${WEB_USER}
+            WEB_GROUP: ${WEB_GROUP}
+        
+    nginx:
+        image: nginx:alpine
+        container_name: nginx
+        networks:
+            - rnet
+        ports:
+            - 80:${NGINX_EXPOSED_PORT}
+        volumes:
+            - ../:${PHP_APP_DIR}
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+            - /Volumes/Grid/Projects/Venti3/vendor/tippingmedia:/app/dev-plugins
+            - /Volumes/Grid/Devbox/www/plugin.dev/craft/plugins:/app/dev2-plugins
+        depends_on:
+            - php-fpm
+
+    mysql-server:
+        image: mariadb:latest
+        container_name: mysql-server
+        networks:
+            - rnet
+        ports:
+            - "3306:3306"
+        volumes:
+            - "${MYSQL_LOCAL_DIR}:${MYSQL_DATA_DIR}"
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+
+networks:
+    rnet:
+        driver: "bridge"

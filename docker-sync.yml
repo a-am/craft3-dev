@@ -1,0 +1,13 @@
+version: '2'
+options:
+    compose-file-path: '/docker/docker-compose.yml'
+    verbose: true
+syncs:
+    app_volume_sync:
+        src: './'
+    # dev1_volume_sync:
+    #     src: '/Volumes/Grid/Projects/Venti3/vendor/tippingmedia'
+    #     sync_excludes: ['Gemfile.lock', 'Gemfile', 'config.rb', '.sass-cache', 'sass', 'sass-cache', 'composer.json' , 'bower.json', 'package.json', 'Gruntfile*', 'bower_components', 'node_modules', '.gitignore', '.git', '*.coffee', '*.scss', '*.sass']
+    # dev2_volume_sync:
+    #     src: '/Volumes/Grid/Devbox/www/plugin.dev/craft/plugins'
+    #     sync_excludes: ['Gemfile.lock', 'Gemfile', 'config.rb', '.sass-cache', 'sass', 'sass-cache', 'composer.json' , 'bower.json', 'package.json', 'Gruntfile*', 'bower_components', 'node_modules', '.gitignore', '.git', '*.coffee', '*.scss', '*.sass']
